@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kisan Setu - Government Procurement Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              dark: '#0a2e18'
+            },
+            accent: {
+              500: '#eab308',
+              600: '#ca8a04',
+              700: '#a16207'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- HEADER NAVIGATION -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('farmer-portal')">
+          <div class="w-12 h-12 bg-gradient-to-tr from-brand-700 via-brand-600 to-brand-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-700/20 ring-4 ring-brand-50">
+            <i data-lucide="wheat" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl font-black tracking-tight text-slate-900">Kisan<span class="text-brand-600">Setu</span></span>
+              <span class="bg-brand-100 text-brand-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-brand-200" data-i18n="badge_simulation">Simulation Portal</span>
+            </div>
+            <p class="text-xs text-slate-500 font-medium" data-i18n="tagline">Government Procurement & Support Network</p>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation Tabs -->
+        <nav class="hidden md:flex items-center bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/80">
+          <button id="nav-farmer-portal" onclick="switchTab('farmer-portal')" 
+            class="nav-tab active flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span data-i18n="nav_farmer_portal">Farmer Portal</span>
+          </button>
+          
+          <button id="nav-slot-booking" onclick="switchTab('slot-booking')" 
+            class="nav-tab flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
+            <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+            <span data-i18n="nav_slot_booking">Slot Booking</span>
+          </button>
+
+          <button id="nav-admin-portal" onclick="switchTab('admin-portal')" 
+            class="nav-tab flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span data-i18n="nav_admin_portal">Admin Portal</span>
+          </button>
+
+          <button id="nav-status-checking" onclick="switchTab('status-checking')" 
+            class="nav-tab flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span data-i18n="nav_status_check">Farmer Status</span>
+          </button>
+        </nav>
+
+        <!-- Right Header Action Controls: Language Switcher & Admin Centre Login -->
+        <div class="hidden lg:flex items-center space-x-3">
+          <!-- Language Selector -->
+          <div class="flex items-center space-x-1.5 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700">
+            <i data-lucide="languages" class="w-4 h-4 text-brand-600"></i>
+            <select id="language-select" onchange="changeLanguage(this.value)" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
+              <option value="en">English</option>
+              <option value="mr">मराठी (Marathi)</option>
+              <option value="hi">हिंदी (Hindi)</option>
+            </select>
+          </div>
+
+          <!-- Central Hub Login Button -->
+          <button onclick="openCentreLoginModal()" class="flex items-center space-x-2 text-xs font-semibold text-slate-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl transition cursor-pointer">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+            </span>
+            <span><span data-i18n="hub_label">Hub:</span> <strong class="text-brand-800 font-bold" id="header-stat-procurement">Pune Central APMC</strong></span>
+            <i data-lucide="log-in" class="w-3.5 h-3.5 text-brand-700"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Controls Bar -->
+      <div class="md:hidden flex flex-col space-y-2 border-t border-slate-200 py-2">
+        <div class="flex items-center justify-between px-1 text-xs">
+          <div class="flex items-center space-x-1 font-bold text-slate-700">
+            <i data-lucide="languages" class="w-3.5 h-3.5 text-brand-600"></i>
+            <select onchange="changeLanguage(this.value)" class="bg-slate-100 rounded px-1.5 py-0.5 border border-slate-300">
+              <option value="en">English</option>
+              <option value="mr">मराठी</option>
+              <option value="hi">हिंदी</option>
+            </select>
+          </div>
+          <button onclick="openCentreLoginModal()" class="bg-emerald-100 text-emerald-900 font-bold px-2.5 py-1 rounded-lg text-[11px] border border-emerald-300 flex items-center space-x-1">
+            <i data-lucide="building-2" class="w-3 h-3"></i>
+            <span id="mobile-hub-label">Pune Central APMC</span>
+          </button>
+        </div>
+
+        <div class="flex space-x-1 overflow-x-auto text-xs font-medium">
+          <button onclick="switchTab('farmer-portal')" id="mobile-nav-farmer-portal" class="flex-1 py-2 px-3 rounded-lg text-center font-semibold text-slate-700 bg-slate-100 whitespace-nowrap" data-i18n="nav_farmer_portal">Farmer Registration</button>
+          <button onclick="switchTab('slot-booking')" id="mobile-nav-slot-booking" class="flex-1 py-2 px-3 rounded-lg text-center font-semibold text-slate-700 bg-slate-100 whitespace-nowrap" data-i18n="nav_slot_booking">Slot Booking</button>
+          <button onclick="switchTab('admin-portal')" id="mobile-nav-admin-portal" class="flex-1 py-2 px-3 rounded-lg text-center font-semibold text-slate-700 bg-slate-100 whitespace-nowrap" data-i18n="nav_admin_portal">Admin Portal</button>
+          <button onclick="switchTab('status-checking')" id="mobile-nav-status-checking" class="flex-1 py-2 px-3 rounded-lg text-center font-semibold text-slate-700 bg-slate-100 whitespace-nowrap" data-i18n="nav_status_check">Status Check</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ========================================== -->
+    <!-- VIEW 1: FARMER REGISTRATION PORTAL -->
+    <!-- ========================================== -->
+    <section id="view-farmer-portal" class="tab-view space-y-8">
+      <!-- Section Banner -->
+      <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="max-w-2xl space-y-3 relative z-10">
+          <span class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur px-3 py-1 rounded-full text-xs font-medium border border-white/20">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-300"></i>
+            <span data-i18n="reg_portal_tag">Unified Farmer Registration Portal</span>
+          </span>
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight leading-tight" data-i18n="reg_portal_title">Welcome to Kisan Setu Registration</h1>
+          <p class="text-brand-100 text-sm sm:text-base leading-relaxed" data-i18n="reg_portal_desc">
+            Register your profile to unlock smooth slot bookings at government procurement centres. Choose standard form filling or experience our interactive AI voice/chat assistant.
+          </p>
+        </div>
+      </div>
+
+      <!-- Registration Mode Switcher Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Traditional Form Switcher Card -->
+        <div id="card-mode-traditional" onclick="setRegistrationMode('traditional')"
+          class="reg-mode-card cursor-pointer bg-white rounded-3xl p-6 border-2 border-brand-500 shadow-md hover:shadow-xl transition-all relative overflow-hidden group">
+          <div class="flex items-start justify-between">
+            <div class="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 group-hover:scale-110 transition-transform">
+              <i data-lucide="file-text" class="w-7 h-7"></i>
+            </div>
+            <span class="bg-brand-100 text-brand-800 text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+              <span data-i18n="mode_trad_badge">Traditional Form</span>
+            </span>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mt-5" data-i18n="mode_trad_title">Standard Online Form</h3>
+          <p class="text-slate-500 text-sm mt-2" data-i18n="mode_trad_desc">Fill out personal, land, and bank details manually step by step with instant field validation.</p>
+        </div>
+
+        <!-- AI Conversation Switcher Card -->
+        <div id="card-mode-ai" onclick="setRegistrationMode('ai')"
+          class="reg-mode-card cursor-pointer bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-md hover:shadow-xl transition-all relative overflow-hidden group">
+          <div class="flex items-start justify-between">
+            <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+              <i data-lucide="bot" class="w-7 h-7"></i>
+            </div>
+            <span class="bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span data-i18n="mode_ai_badge">AI Assisted</span>
+            </span>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mt-5" data-i18n="mode_ai_title">Conversation with AI</h3>
+          <p class="text-slate-500 text-sm mt-2" data-i18n="mode_ai_desc">Simply chat or speak with our AI Assistant. It asks questions and automatically fills the registration form for you!</p>
+        </div>
+      </div>
+
+      <!-- REGISTRATION CONTAINER -->
+      <!-- TRADITIONAL FORM -->
+      <div id="container-traditional-form" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-8">
+        <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center space-x-2">
+              <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-600"></i>
+              <span data-i18n="form_heading">Farmer Profile Registration Form</span>
+            </h2>
+            <p class="text-xs text-slate-500" data-i18n="form_subheading">Please enter accurate details to generate your unique Kisan Setu ID.</p>
+          </div>
+          <button type="button" onclick="prefillSampleFarmer()" class="text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg transition border border-brand-200 flex items-center space-x-1">
+            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+            <span data-i18n="btn_demo_fill">Fill Demo Data</span>
+          </button>
+        </div>
+
+        <form id="form-farmer-registration" onsubmit="handleRegistrationSubmit(event)" class="space-y-8">
+          <!-- 1. Farmer Details -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-brand-800 uppercase tracking-wider bg-brand-50/70 p-2.5 rounded-xl border border-brand-100 flex items-center space-x-2">
+              <span class="w-6 h-6 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs">1</span>
+              <span data-i18n="sec_farmer_details">Farmer Details</span>
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_name">Full Name</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-name" required placeholder="e.g. Ramesh Kumar Patil"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_aadhar">Aadhar Number (12 Digits)</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-aadhar" required pattern="[0-9]{12}" maxlength="12" placeholder="e.g. 548912348765"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_mobile">Mobile Number</span> <span class="text-red-500">*</span></label>
+                <input type="tel" id="reg-mobile" required pattern="[0-9]{10}" maxlength="10" placeholder="e.g. 9823012345"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_dob">Date of Birth</span> <span class="text-red-500">*</span></label>
+                <input type="date" id="reg-dob" required
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_district">District</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-district" required placeholder="e.g. Pune"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_taluka">Taluka</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-taluka" required placeholder="e.g. Haveli"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_village">Village</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-village" required placeholder="e.g. Wagholi"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_address">Full Address</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-address" required placeholder="House/Gat info, Village, District"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Land Details -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-brand-800 uppercase tracking-wider bg-brand-50/70 p-2.5 rounded-xl border border-brand-100 flex items-center space-x-2">
+              <span class="w-6 h-6 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs">2</span>
+              <span data-i18n="sec_land_details">Land Details</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_gat">Gat Number (Survey No.)</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-gat" required placeholder="e.g. 142/A"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_saatbaara">Saatbaara (7/12) Detail</span> <span class="text-slate-400 font-normal">(Optional)</span></label>
+                <input type="text" id="reg-saatbaara" placeholder="e.g. 7-12-MH-2026-881"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_total_acres">Total Acres of Land</span> <span class="text-red-500">*</span></label>
+                <input type="number" step="0.1" id="reg-total-acres" required placeholder="e.g. 5.5"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_cultivation_acres">Cultivation Area (Acres)</span> <span class="text-red-500">*</span></label>
+                <input type="number" step="0.1" id="reg-cultivation-acres" required placeholder="e.g. 4.0"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Bank Details -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-brand-800 uppercase tracking-wider bg-brand-50/70 p-2.5 rounded-xl border border-brand-100 flex items-center space-x-2">
+              <span class="w-6 h-6 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs">3</span>
+              <span data-i18n="sec_bank_details">Bank Account Details</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_bank_name">Bank Name</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-bank-name" required placeholder="e.g. State Bank of India"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_account_holder">Account Holder Name</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-account-holder" required placeholder="As per bank passbook"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_account_number">Account Number</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-account-number" required placeholder="e.g. 30948572019"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_ifsc">IFSC Code</span> <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-ifsc" required placeholder="e.g. SBIN0001234"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm">
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 flex justify-end">
+            <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-3.5 rounded-2xl shadow-lg shadow-brand-600/30 hover:shadow-xl transition flex items-center space-x-2">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span data-i18n="btn_register_submit">Register & Generate Kisan Setu ID</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- AI CONVERSATION CONTAINER -->
+      <div id="container-ai-registration" class="hidden bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[580px]">
+        <!-- AI Chat Interface -->
+        <div class="lg:col-span-7 p-6 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-200 bg-slate-50/50">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-amber-500 text-white rounded-xl flex items-center justify-center shadow-md">
+                <i data-lucide="bot" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-900">Kisan Setu AI Agent</h3>
+                <p class="text-xs text-brand-600 font-semibold flex items-center space-x-1">
+                  <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                  <span data-i18n="ai_agent_sub">Interactive Voice/Text Assistant</span>
+                </p>
+              </div>
+            </div>
+            <button onclick="restartAiRegistration()" class="text-xs font-semibold text-slate-600 bg-slate-200/80 hover:bg-slate-200 px-2.5 py-1 rounded-lg transition" data-i18n="btn_reset_chat">
+              Reset Chat
+            </button>
+          </div>
+
+          <!-- Chat History Window -->
+          <div id="ai-chat-history" class="flex-1 overflow-y-auto my-4 space-y-4 pr-2 text-sm max-h-[420px]">
+            <!-- Dynamic Chat Messages -->
+          </div>
+
+          <!-- Quick Suggestion Buttons -->
+          <div id="ai-suggestions" class="flex flex-wrap gap-2 mb-3">
+            <!-- Dynamic Suggestion Pills -->
+          </div>
+
+          <!-- Chat Input -->
+          <form onsubmit="handleAiChatSubmit(event)" class="flex items-center space-x-2 pt-2 border-t border-slate-200">
+            <input type="text" id="ai-chat-input" placeholder="Type your response here..." autocomplete="off"
+              class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
+            <button type="button" id="btn-speech-toggle" onclick="toggleSpeechRecognition()" title="Voice input simulation"
+              class="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition">
+              <i data-lucide="mic" class="w-5 h-5"></i>
+            </button>
+            <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-xl font-bold transition flex items-center space-x-1">
+              <span data-i18n="btn_send">Send</span>
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- Live Form Extraction Preview -->
+        <div class="lg:col-span-5 p-6 bg-slate-900 text-slate-100 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center space-x-1">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span data-i18n="ai_extracted_label">Live Data Extracted</span>
+              </span>
+              <span class="text-xs text-slate-400" id="ai-extraction-progress">0 of 8 fields filled</span>
+            </div>
+
+            <div class="space-y-3 text-xs" id="ai-live-extracted-data">
+              <!-- Live JSON field preview list -->
+            </div>
+          </div>
+
+          <div class="pt-6 border-t border-slate-800 flex justify-end">
+            <button id="btn-complete-ai-reg" disabled onclick="completeAiRegistration()"
+              class="w-full bg-slate-700 text-slate-400 cursor-not-allowed font-bold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              <span data-i18n="btn_finalize_ai">Finalize AI Registration</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: SLOT BOOKING WINDOW -->
+    <!-- ========================================== -->
+    <section id="view-slot-booking" class="tab-view hidden space-y-8">
+      <!-- Section Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-brand-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="max-w-2xl space-y-3 relative z-10">
+          <span class="inline-flex items-center space-x-2 bg-amber-400/20 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold border border-amber-400/30 text-amber-300">
+            <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+            <span data-i18n="slot_banner_badge">Procurement Slot Reservation System</span>
+          </span>
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight leading-tight" data-i18n="slot_banner_title">Book Your Procurement Slot</h1>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed" data-i18n="slot_banner_desc">
+            Verify your Kisan Setu ID first, select a nearby procurement centre, then choose any of the 4 booking simulations below to reserve your arrival token.
+          </p>
+        </div>
+      </div>
+
+      <!-- SIMULATION MODE SELECTOR TABS -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <button onclick="setSlotBookingMode('ai')" id="slot-mode-ai"
+          class="slot-mode-btn bg-white rounded-2xl p-4 border-2 border-brand-500 text-left shadow-sm hover:shadow-md transition">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+            <i data-lucide="bot" class="w-5 h-5"></i>
+          </div>
+          <span class="block text-xs font-bold text-slate-400">Mode 1</span>
+          <span class="block font-bold text-slate-900 text-sm">AI Voice & Chat</span>
+        </button>
+
+        <button onclick="setSlotBookingMode('ivr')" id="slot-mode-ivr"
+          class="slot-mode-btn bg-white rounded-2xl p-4 border-2 border-slate-200 text-left shadow-sm hover:shadow-md transition">
+          <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-2">
+            <i data-lucide="phone-call" class="w-5 h-5"></i>
+          </div>
+          <span class="block text-xs font-bold text-slate-400">Mode 2</span>
+          <span class="block font-bold text-slate-900 text-sm">IVR Keypad Call</span>
+        </button>
+
+        <button onclick="setSlotBookingMode('sms')" id="slot-mode-sms"
+          class="slot-mode-btn bg-white rounded-2xl p-4 border-2 border-slate-200 text-left shadow-sm hover:shadow-md transition">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+          </div>
+          <span class="block text-xs font-bold text-slate-400">Mode 3</span>
+          <span class="block font-bold text-slate-900 text-sm">SMS Service</span>
+        </button>
+
+        <button onclick="setSlotBookingMode('web')" id="slot-mode-web"
+          class="slot-mode-btn bg-white rounded-2xl p-4 border-2 border-slate-200 text-left shadow-sm hover:shadow-md transition">
+          <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-2">
+            <i data-lucide="globe" class="w-5 h-5"></i>
+          </div>
+          <span class="block text-xs font-bold text-slate-400">Mode 4</span>
+          <span class="block font-bold text-slate-900 text-sm">Web App Portal</span>
+        </button>
+      </div>
+
+      <!-- KISAN SETU ID LOOKUP HEADER FOR SLOT BOOKING -->
+      <div class="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow">
+            <i data-lucide="id-card" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900" data-i18n="slot_step1_title">Step 1: Enter / Select Kisan Setu ID</h3>
+            <p class="text-xs text-slate-600" data-i18n="slot_step1_sub">Verification is required before booking a slot.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+          <select id="slot-id-select" onchange="handleSlotIdSelect(this.value)" class="bg-white border border-slate-300 text-slate-900 text-sm font-semibold rounded-xl p-3 focus:ring-2 focus:ring-amber-500 w-full sm:w-64">
+            <!-- Dynamic list of registered farmers -->
+          </select>
+          <button onclick="verifySlotIdManually()" class="bg-slate-900 text-white px-4 py-3 rounded-xl font-bold text-sm whitespace-nowrap hover:bg-slate-800 transition" data-i18n="btn_verify_id">
+            Verify ID
+          </button>
+        </div>
+      </div>
+
+      <!-- ID VERIFICATION BADGE -->
+      <div id="verified-farmer-banner" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider" data-i18n="verified_farmer_title">Verified Farmer Profile</span>
+            <h4 class="text-base font-bold text-slate-900" id="vf-name">Ramesh Kumar Patil</h4>
+            <p class="text-xs text-slate-600" id="vf-details">ID: KS-2026-9842 | Village: Wagholi, Pune | Land: 5.5 Acres</p>
+          </div>
+        </div>
+        <span class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full" data-i18n="id_active_badge">ID Active</span>
+      </div>
+
+      <!-- SIMULATION CONTAINERS -->
+
+      <!-- MODE 1: AI CHAT SLOT SIMULATOR -->
+      <div id="container-slot-ai" class="slot-sim-container bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-amber-500 text-white rounded-xl flex items-center justify-center">
+              <i data-lucide="bot" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900" data-i18n="ai_slot_heading">AI Slot Booking Conversation</h3>
+              <p class="text-xs text-slate-500" data-i18n="ai_slot_sub">Interactive voice/text slot assistant</p>
+            </div>
+          </div>
+          <button onclick="restartAiSlotChat()" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg" data-i18n="btn_reset">Reset</button>
+        </div>
+
+        <div id="ai-slot-history" class="space-y-4 min-h-[300px] max-h-[400px] overflow-y-auto p-4 bg-slate-50 rounded-2xl border border-slate-200 text-sm">
+          <!-- Chat messages -->
+        </div>
+
+        <div id="ai-slot-suggestions" class="flex flex-wrap gap-2">
+          <!-- Option buttons -->
+        </div>
+
+        <form onsubmit="handleAiSlotSubmit(event)" class="flex items-center space-x-2 pt-2">
+          <input type="text" id="ai-slot-input" placeholder="Type or click suggested options..." autocomplete="off"
+            class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 text-sm">
+          <button type="submit" class="bg-amber-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-amber-700 transition" data-i18n="btn_send">Send</button>
+        </form>
+      </div>
+
+      <!-- MODE 2: IVR CALL SIMULATOR -->
+      <div id="container-slot-ivr" class="slot-sim-container hidden bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl">
+        <div class="max-w-md mx-auto space-y-6">
+          <div class="text-center space-y-2">
+            <span class="inline-flex items-center space-x-2 bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold border border-blue-500/30">
+              <i data-lucide="phone-incoming" class="w-3.5 h-3.5"></i>
+              <span>Keypad Phone IVR Stimulation (Toll-Free 1800-KISAN-SETU)</span>
+            </span>
+            <h3 class="text-2xl font-black tracking-tight" id="ivr-status-heading">Kisan Setu IVR Voice Line</h3>
+            <p class="text-xs text-slate-400" id="ivr-audio-prompt">Press Start IVR Call button to dial...</p>
+          </div>
+
+          <!-- Visual Phone Screen -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-3 shadow-inner">
+            <div class="flex justify-between items-center text-xs text-slate-500">
+              <span>SIM 1: BSNL 4G</span>
+              <span id="ivr-timer" class="font-mono text-emerald-400">00:00</span>
+            </div>
+            <div class="py-3 px-4 bg-slate-900 rounded-xl text-brand-400 font-mono text-lg font-bold tracking-wider min-h-[48px] flex items-center justify-center border border-slate-800" id="ivr-screen-display">
+              -- CALL DISCONNECTED --
+            </div>
+          </div>
+
+          <!-- Keypad Grid -->
+          <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+            <button onclick="pressIvrKey('1')" class="ivr-key">1 <span class="block text-[10px] text-slate-400 font-normal">--</span></button>
+            <button onclick="pressIvrKey('2')" class="ivr-key">2 <span class="block text-[10px] text-slate-400 font-normal">ABC</span></button>
+            <button onclick="pressIvrKey('3')" class="ivr-key">3 <span class="block text-[10px] text-slate-400 font-normal">DEF</span></button>
+            <button onclick="pressIvrKey('4')" class="ivr-key">4 <span class="block text-[10px] text-slate-400 font-normal">GHI</span></button>
+            <button onclick="pressIvrKey('5')" class="ivr-key">5 <span class="block text-[10px] text-slate-400 font-normal">JKL</span></button>
+            <button onclick="pressIvrKey('6')" class="ivr-key">6 <span class="block text-[10px] text-slate-400 font-normal">MNO</span></button>
+            <button onclick="pressIvrKey('7')" class="ivr-key">7 <span class="block text-[10px] text-slate-400 font-normal">PQRS</span></button>
+            <button onclick="pressIvrKey('8')" class="ivr-key">8 <span class="block text-[10px] text-slate-400 font-normal">TUV</span></button>
+            <button onclick="pressIvrKey('9')" class="ivr-key">9 <span class="block text-[10px] text-slate-400 font-normal">WXYZ</span></button>
+            <button onclick="pressIvrKey('*')" class="ivr-key">*</button>
+            <button onclick="pressIvrKey('0')" class="ivr-key">0 <span class="block text-[10px] text-slate-400 font-normal">+</span></button>
+            <button onclick="pressIvrKey('#')" class="ivr-key">#</button>
+          </div>
+
+          <!-- Call Action Buttons -->
+          <div class="flex items-center justify-center space-x-4">
+            <button id="btn-ivr-start" onclick="startIvrCall()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-2xl transition flex items-center justify-center space-x-2">
+              <i data-lucide="phone" class="w-5 h-5"></i>
+              <span>Start IVR Call</span>
+            </button>
+            <button id="btn-ivr-end" onclick="endIvrCall()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded-2xl transition flex items-center justify-center space-x-2">
+              <i data-lucide="phone-off" class="w-5 h-5"></i>
+              <span>Hang Up</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODE 3: SMS SIMULATOR -->
+      <div id="container-slot-sms" class="slot-sim-container hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-6">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center">
+              <i data-lucide="message-square" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900">SMS Booking Gateway (51414)</h3>
+              <p class="text-xs text-slate-500">Send formatted SMS for feature/keypad phones</p>
+            </div>
+          </div>
+          <button onclick="resetSmsSimulator()" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg">Clear SMS</button>
+        </div>
+
+        <div class="max-w-xl mx-auto bg-slate-900 rounded-3xl p-4 shadow-xl border border-slate-800">
+          <!-- Mobile Screen Header -->
+          <div class="bg-slate-800 px-4 py-3 rounded-t-2xl flex items-center justify-between text-xs text-slate-300 border-b border-slate-700">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="message-circle" class="w-4 h-4 text-emerald-400"></i>
+              <span class="font-bold text-white">To: KISAN-SETU (51414)</span>
+            </div>
+            <span>Standard SMS Rates Apply</span>
+          </div>
+
+          <!-- SMS Conversation Thread -->
+          <div id="sms-thread-history" class="p-4 space-y-3 min-h-[280px] max-h-[360px] overflow-y-auto bg-slate-950 rounded-b-2xl text-xs">
+            <!-- Messages inserted here -->
+          </div>
+
+          <!-- SMS Format Helper Pills -->
+          <div class="pt-3 border-t border-slate-800 space-y-2">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Click sample command to populate:</span>
+            <div class="flex flex-wrap gap-2 text-xs" id="sms-quick-templates">
+              <!-- Inserted dynamically -->
+            </div>
+          </div>
+
+          <!-- SMS Input Box -->
+          <form onsubmit="handleSmsSend(event)" class="flex items-center space-x-2 pt-3">
+            <input type="text" id="sms-input" placeholder="e.g. SLOT KS-2026-9842 PUNE GRAINS WHEAT 40 MORNING" required
+              class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 text-xs font-mono">
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition flex items-center space-x-1">
+              <span>Send SMS</span>
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODE 4: WEB PORTAL FORM -->
+      <div id="container-slot-web" class="slot-sim-container hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <h3 class="text-xl font-bold text-slate-900 flex items-center space-x-2">
+            <i data-lucide="globe" class="w-5 h-5 text-purple-600"></i>
+            <span data-i18n="web_slot_heading">Web Slot Booking Portal</span>
+          </h3>
+          <p class="text-xs text-slate-500" data-i18n="web_slot_sub">Select a nearby procurement centre, crop category, date, and time slot.</p>
+        </div>
+
+        <form id="form-web-slot-booking" onsubmit="handleWebSlotSubmit(event)" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 1. Procurement Centre (Selection of 5 Centres) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_select_centre">Select Nearby Procurement Centre</span> <span class="text-red-500">*</span></label>
+              <select id="web-slot-centre" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 text-sm font-semibold">
+                <option value="Pune Central APMC Mandi">Pune Central APMC Mandi (Hub: PC-APMC-01)</option>
+                <option value="Nashik Regional Grain Hub">Nashik Regional Grain Hub (Hub: NR-GHUB-02)</option>
+                <option value="Nagpur Pulse & Cotton Centre">Nagpur Pulse & Cotton Centre (Hub: NP-CMANDI-03)</option>
+                <option value="Kolhapur Agricultural Hub">Kolhapur Agricultural Hub (Hub: KA-HUB-04)</option>
+                <option value="Amravati Grain Procurement Centre">Amravati Grain Procurement Centre (Hub: AG-PROC-05)</option>
+              </select>
+            </div>
+
+            <!-- 2. Crop Category -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_crop_category">Crop Category</span> <span class="text-red-500">*</span></label>
+              <select id="web-slot-category" onchange="updateCropDropdown(this.value)" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 text-sm font-semibold">
+                <option value="Grains">Grains (अन्नधान्य)</option>
+                <option value="Pulses">Pulses (कडधान्ये)</option>
+                <option value="Fibres">Fibres (कापूस / फायबर)</option>
+              </select>
+            </div>
+
+            <!-- 3. Specific Crop -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_crop_name">Crop Name</span> <span class="text-red-500">*</span></label>
+              <select id="web-slot-crop" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 text-sm font-semibold">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+
+            <!-- 4. Approximate Quantity -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_quantity">Approximate Quantity (in Quintals)</span> <span class="text-red-500">*</span></label>
+              <input type="number" step="1" min="1" id="web-slot-qty" required placeholder="e.g. 50"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 text-sm font-semibold">
+              <span class="text-[11px] text-slate-400">1 Quintal = 100 kg</span>
+            </div>
+
+            <!-- 5. Select Date -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_preferred_date">Preferred Arrival Date</span> <span class="text-red-500">*</span></label>
+              <input type="date" id="web-slot-date" required
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 text-sm font-semibold">
+            </div>
+
+            <!-- 6. Select Time Slot -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"><span data-i18n="lbl_time_slot">Select Time Slot</span> <span class="text-red-500">*</span></label>
+              <select id="web-slot-time" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 text-sm font-semibold">
+                <option value="Morning Slot (08:00 AM - 11:00 AM)">Morning Slot (08:00 AM - 11:00 AM)</option>
+                <option value="Midday Slot (11:00 AM - 02:00 PM)">Midday Slot (11:00 AM - 02:00 PM)</option>
+                <option value="Afternoon Slot (02:00 PM - 05:00 PM)">Afternoon Slot (02:00 PM - 05:00 PM)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pt-4 flex justify-end">
+            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition flex items-center space-x-2">
+              <i data-lucide="ticket" class="w-5 h-5"></i>
+              <span data-i18n="btn_issue_slot_token">Confirm Slot & Issue Attendance Token</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 3: ADMIN PORTAL (PROCUREMENT CENTRE) -->
+    <!-- ========================================== -->
+    <section id="view-admin-portal" class="tab-view hidden space-y-8">
+      <!-- Section Banner & Metrics -->
+      <div class="bg-slate-900 text-white rounded-3xl p-8 shadow-xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2 text-brand-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i data-lucide="building-2" class="w-4 h-4"></i>
+              <span>Central Procurement Management Desk</span>
+            </div>
+            <h1 class="text-3xl font-black" id="admin-centre-title-heading">Pune Central APMC Mandi</h1>
+            <p class="text-xs text-slate-400 mt-1" id="admin-logged-in-badge">Logged in as: Admin (Hub ID: PC-APMC-01)</p>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <button onclick="openWalkinModal()" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg transition flex items-center space-x-2 text-sm">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span data-i18n="btn_walkin_add">+ Walk-in Registration & Instant Token</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Counter Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-800">
+          <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+            <span class="text-xs text-slate-400 font-semibold" data-i18n="stat_farmers">Total Farmers Registered</span>
+            <div class="text-2xl font-black text-white mt-1" id="stat-total-farmers">0</div>
+          </div>
+          <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+            <span class="text-xs text-slate-400 font-semibold" data-i18n="stat_booked">Booked Slots & Tokens</span>
+            <div class="text-2xl font-black text-amber-400 mt-1" id="stat-booked-slots">0</div>
+          </div>
+          <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+            <span class="text-xs text-slate-400 font-semibold" data-i18n="stat_weight">Total Weighed</span>
+            <div class="text-2xl font-black text-brand-400 mt-1" id="stat-total-weight">0 Qtls</div>
+          </div>
+          <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+            <span class="text-xs text-slate-400 font-semibold" data-i18n="stat_payout">Total Payout Disbursed</span>
+            <div class="text-2xl font-black text-emerald-400 mt-1" id="stat-total-payout">₹0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTER & CATEGORY TOOLBAR -->
+      <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <!-- Crop Category Filter Buttons -->
+          <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mr-2" data-i18n="lbl_filter_category">Filter Category:</span>
+            <button onclick="filterAdminCategory('ALL')" id="admin-cat-ALL" class="admin-cat-pill active">All Crops</button>
+            <button onclick="filterAdminCategory('Grains')" id="admin-cat-Grains" class="admin-cat-pill">🌾 Grains</button>
+            <button onclick="filterAdminCategory('Pulses')" id="admin-cat-Pulses" class="admin-cat-pill">🫘 Pulses</button>
+            <button onclick="filterAdminCategory('Fibres')" id="admin-cat-Fibres" class="admin-cat-pill">🧵 Fibres</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="w-full md:w-72">
+            <div class="relative">
+              <input type="text" id="admin-search-input" oninput="renderAdminFarmerList()" placeholder="Search Name, ID, Token, Mobile..."
+                class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FARMER ENQUIRY & PROCUREMENT PROCESS LIST -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900" data-i18n="admin_list_heading">Procurement Enquiries & Active Batches</h2>
+            <p class="text-xs text-slate-500" data-i18n="admin_list_sub">Sequential step-by-step unlocking logic enforced.</p>
+          </div>
+          <span class="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full" id="admin-records-count">0 Records</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3.5 px-6">Kisan Setu ID & Token</th>
+                <th class="py-3.5 px-6">Farmer Info</th>
+                <th class="py-3.5 px-6">Crop & Category</th>
+                <th class="py-3.5 px-6">Slot Date & Centre</th>
+                <th class="py-3.5 px-6">Current Progress Stage</th>
+                <th class="py-3.5 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-farmer-table-body" class="divide-y divide-slate-100 text-sm">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ========================================== -->
+    <!-- VIEW 4: FARMER PROCUREMENT STATUS CHECKING -->
+    <!-- ========================================== -->
+    <section id="view-status-checking" class="tab-view hidden space-y-8">
+      <!-- Section Banner -->
+      <div class="bg-gradient-to-r from-brand-800 to-slate-900 rounded-3xl p-8 text-white shadow-xl space-y-4">
+        <span class="bg-white/10 text-brand-300 text-xs font-bold px-3 py-1 rounded-full border border-white/10 inline-flex items-center space-x-1">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+          <span data-i18n="status_banner_badge">Live Procurement Tracker</span>
+        </span>
+        <h1 class="text-3xl font-black" data-i18n="status_banner_title">Check Your Procurement Status</h1>
+        <p class="text-slate-300 text-sm max-w-2xl" data-i18n="status_banner_desc">
+          Enter your Kisan Setu ID, Attendance Token ID, or registered mobile number to view real-time sequential progress.
+        </p>
+
+        <!-- Search Bar -->
+        <form onsubmit="handleStatusSearch(event)" class="max-w-xl flex items-center space-x-2 pt-2">
+          <input type="text" id="status-search-id" placeholder="Enter Kisan Setu ID (e.g. KS-2026-9842), Token (TK-PUNE-8942) or Mobile" required
+            class="flex-1 px-4 py-3.5 rounded-2xl bg-white text-slate-900 placeholder-slate-400 font-bold focus:ring-4 focus:ring-brand-400 text-sm shadow-inner">
+          <button type="submit" class="bg-brand-500 hover:bg-brand-400 text-white font-bold px-6 py-3.5 rounded-2xl transition shadow-lg flex items-center space-x-2 text-sm">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span data-i18n="btn_track">Track</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- STATUS DISPLAY RESULTS -->
+      <div id="status-result-container" class="hidden space-y-8">
+        <!-- Farmer & Slot Summary Card -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-extrabold text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-lg border border-brand-200" id="status-display-id">KS-2026-9842</span>
+              <span class="text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200" id="status-display-token">TK-PUNE-8942</span>
+              <span class="text-xs text-slate-500" id="status-display-centre">Pune Central APMC Mandi</span>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900" id="status-display-name">Ramesh Kumar Patil</h2>
+            <p class="text-xs text-slate-500" id="status-display-crop-info">Crop: Wheat (Grains) | Est. Qty: 45 Quintals</p>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-right space-y-1 w-full md:w-auto">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Payment Summary</span>
+            <div class="text-xl font-black text-emerald-600" id="status-display-payout">₹0.00</div>
+            <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded" id="status-display-pay-badge">Pending Approval</span>
+          </div>
+        </div>
+
+        <!-- 7-STEP VISUAL PROGRESSION TIMELINE -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <i data-lucide="git-commit" class="w-5 h-5 text-brand-600"></i>
+            <span data-i18n="timeline_heading">Procurement Lifecycle Stepper</span>
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-7 gap-4 relative">
+            <!-- Step 1: Registration -->
+            <div id="step-card-1" class="procurement-step-card">
+              <div class="step-icon"><i data-lucide="check" class="w-4 h-4"></i></div>
+              <span class="step-num">Step 1</span>
+              <h4 class="step-title" data-i18n="step1_title">Farmer Registration</h4>
+              <p class="step-desc" id="step-desc-1">Kisan Setu ID Generated</p>
+            </div>
+
+            <!-- Step 2: Slot Booking -->
+            <div id="step-card-2" class="procurement-step-card">
+              <div class="step-icon"><i data-lucide="calendar" class="w-4 h-4"></i></div>
+              <span class="step-num">Step 2</span>
+              <h4 class="step-title" data-i18n="step2_title">Slot & Token</h4>
+              <p class="step-desc" id="step-desc-2">Token Issued</p>
+            </div>
+
+            <!-- Step 3: Walk-in Arrival -->
+            <div id="step-card-3" class="procurement-step-card">
+              <div class="step-icon"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+              <span class="step-num">Step 3</span>
+              <h4 class="step-title" data-i18n="step3_title">Attendance Check-in</h4>
+              <p class="step-desc" id="step-desc-3">Token Attendance</p>
+            </div>
+
+            <!-- Step 4: Weighing Produce -->
+            <div id="step-card-4" class="procurement-step-card">
+              <div class="step-icon"><i data-lucide="scale" class="w-4 h-4"></i></div>
+              <span class="step-num">Step 4</span>
+              <h4 class="step-title" data-i18n="step4_title">Weighing Produce</h4>
+              <p class="step-desc" id="step-desc-4">Weight Entry</p>
+            </div>
+
+            <!-- Step 5: Quality Check -->
+            <div id="step-card-5" class="procurement-step-card">
+              <div class="step-icon"><i data-lucide="award" class="w-4 h-4"></i></div>
+              <span class="step-num">Step 5</span>
+              <h4 class="step-title" data-i18n="step5_title">Quality Check</h4>
+              <p class="step-desc" id="step-desc-5">Grade Verification</p>
+            </div>
+
+            <!-- Step 6: Approved for Sale -->
+            <div id="step-card-6" class="procurement-step-card">
+              <div class="step-icon"><i data-lucide="shopping-bag" class="w-4 h-4"></i></div>
+              <span class="step-num">Step 6</span>
+              <h4 class="step-title" data-i18n="step6_title">Approved for Sale</h4>
+              <p class="step-desc" id="step-desc-6">MSP Calculation</p>
+            </div>
+
+            <!-- Step 7: Payment Status -->
+            <div id="step-card-7" class="procurement-step-card">
+              <div class="step-icon"><i data-lucide="credit-card" class="w-4 h-4"></i></div>
+              <span class="step-num">Step 7</span>
+              <h4 class="step-title" data-i18n="step7_title">Payment Disbursal</h4>
+              <p class="step-desc" id="step-desc-7">Bank Transfer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL: PROCUREMENT CENTRE ADMIN LOGIN -->
+  <!-- ========================================== -->
+  <div id="modal-centre-login" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative">
+      <button onclick="closeCentreLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-lg">
+          <i data-lucide="building-2" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-2xl font-black text-slate-900">Procurement Centre Login</h3>
+        <p class="text-xs text-slate-500">Authenticate as an official procurement centre administrator</p>
+      </div>
+
+      <form id="form-centre-login" onsubmit="handleCentreLoginSubmit(event)" class="space-y-4 text-xs font-semibold">
+        <div>
+          <label class="block text-slate-700 mb-1">Select Procurement Centre *</label>
+          <select id="login-centre-select" onchange="autoFillCentreId(this.value)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 font-bold text-sm">
+            <option value="Pune Central APMC Mandi">Pune Central APMC Mandi (ID: PC-APMC-01)</option>
+            <option value="Nashik Regional Grain Hub">Nashik Regional Grain Hub (ID: NR-GHUB-02)</option>
+            <option value="Nagpur Pulse & Cotton Centre">Nagpur Pulse & Cotton Centre (ID: NP-CMANDI-03)</option>
+            <option value="Kolhapur Agricultural Hub">Kolhapur Agricultural Hub (ID: KA-HUB-04)</option>
+            <option value="Amravati Grain Procurement Centre">Amravati Grain Procurement Centre (ID: AG-PROC-05)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 mb-1">Centre ID *</label>
+          <input type="text" id="login-centre-id" required value="PC-APMC-01" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono">
+        </div>
+
+        <div>
+          <label class="block text-slate-700 mb-1">Admin Password *</label>
+          <input type="password" id="login-password" required value="admin123" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm">
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Authenticate & Access Centre Portal</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL: WALK-IN REGISTRATION & SLOT (ADMIN) -->
+  <!-- ========================================== -->
+  <div id="modal-walkin" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+        <div>
+          <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded-full border border-brand-200">On-Site Registration</span>
+          <h3 class="text-xl font-bold text-slate-900 mt-1">Walk-in Farmer Registration & Instant Attendance Token</h3>
+        </div>
+        <button onclick="closeWalkinModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <form id="form-walkin" onsubmit="handleWalkinSubmit(event)" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+            <input type="text" id="walkin-name" required placeholder="e.g. Suresh Marathe" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
+            <input type="tel" id="walkin-mobile" pattern="[0-9]{10}" required placeholder="e.g. 9765432109" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Aadhar Number *</label>
+            <input type="text" id="walkin-aadhar" pattern="[0-9]{12}" required placeholder="12 Digit Aadhar" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">District / Village *</label>
+            <input type="text" id="walkin-address" required placeholder="e.g. Haveli, Pune" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Crop Category *</label>
+            <select id="walkin-category" onchange="updateWalkinCropDropdown(this.value)" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-semibold">
+              <option value="Grains">Grains</option>
+              <option value="Pulses">Pulses</option>
+              <option value="Fibres">Fibres</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Crop Name *</label>
+            <select id="walkin-crop" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-semibold">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Quantity (Quintals) *</label>
+            <input type="number" id="walkin-qty" required placeholder="e.g. 35" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Gat / Survey No. *</label>
+            <input type="text" id="walkin-gat" required placeholder="e.g. 88/B" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+          </div>
+        </div>
+
+        <div class="pt-4 flex justify-end space-x-3 border-t border-slate-200">
+          <button type="button" onclick="closeWalkinModal()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm">Cancel</button>
+          <button type="submit" class="bg-brand-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-brand-700">Register & Issue Token</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADMIN SEQUENTIAL WORKFLOW MODAL -->
+  <!-- ========================================== -->
+  <div id="modal-admin-workflow" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+        <div>
+          <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">Sequential Step Unlocking</span>
+          <h3 class="text-xl font-bold text-slate-900 mt-1" id="wf-modal-farmer-name">Manage Farmer Workflow</h3>
+          <p class="text-xs text-slate-500" id="wf-modal-subtext">ID: KS-2026-9842 | Token: TK-PUNE-8942</p>
+        </div>
+        <button onclick="closeAdminWorkflowModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Interactive Sequential 7-Step List -->
+      <div class="space-y-4 text-xs" id="wf-modal-steps-container">
+        <!-- Generated dynamically in JS -->
+      </div>
+
+      <div class="pt-4 flex justify-between border-t border-slate-200">
+        <button type="button" onclick="closeAdminWorkflowModal()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold">Close</button>
+        <button type="button" onclick="saveAdminWorkflowChanges()" class="bg-brand-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-brand-700">Save Workflow Updates</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL: KISAN SETU ID DIGITAL CARD / RECEIPT -->
+  <!-- ========================================== -->
+  <div id="modal-id-card" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-6 shadow-2xl relative">
+      <button onclick="closeIdCardModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <!-- Digital Pass Card -->
+      <div id="printable-card" class="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-700 text-white p-6 rounded-2xl shadow-xl space-y-4 border-2 border-brand-400/30">
+        <div class="flex items-center justify-between border-b border-brand-600/60 pb-3">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="wheat" class="w-6 h-6 text-brand-300"></i>
+            <span class="font-black text-lg">Kisan Setu Pass</span>
+          </div>
+          <span class="bg-amber-400/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-400/30" id="card-token-badge">TOKEN: TK-PUNE-8942</span>
+        </div>
+
+        <div class="text-center py-2 space-y-1">
+          <span class="text-[11px] text-brand-200 uppercase tracking-widest block">Unique Registration ID</span>
+          <div class="text-3xl font-black tracking-wider text-amber-300 font-mono" id="card-id-number">KS-2026-9842</div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-xs border-t border-brand-600/60 pt-3">
+          <div>
+            <span class="text-[10px] text-brand-300 block">Farmer Name</span>
+            <strong id="card-name" class="font-bold text-white">Ramesh Patil</strong>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-300 block">Mobile No.</span>
+            <strong id="card-mobile" class="font-bold text-white">9823012345</strong>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-300 block">Land / Gat No.</span>
+            <strong id="card-land" class="font-bold text-white">5.5 Acres (Gat 142)</strong>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-300 block">Bank Account</span>
+            <strong id="card-bank" class="font-bold text-white">SBI **** 2019</strong>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between border-t border-brand-600/60">
+          <div class="flex items-center space-x-1 text-[10px] text-brand-200">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-300"></i>
+            <span>Verified Aadhaar Linked</span>
+          </div>
+          <span class="text-[10px] text-slate-300" id="card-date">Issued: 12-Sep-2026</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button onclick="window.print()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-1">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Print / Save Pass</span>
+        </button>
+        <button onclick="proceedToSlotWithCardId()" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center space-x-1">
+          <span>Book Slot Now</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
